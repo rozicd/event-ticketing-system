@@ -30,6 +30,6 @@ Backend će se sastojati od 5 mikroservisa.
 - servis za recenzije
 - servis za analitiku
 
-Aplikacija će imati svoj api gateaway implementiran u programskom jeziku Python. Servis za korisnike/auth će, takođe, biti implementiran programskom jeziku Python i koristiće MySql bazu podataka dok će se za ostale servise koristiti Rust programski jezik i PostgreSql za bazu.
+Aplikacija će imati svoj api gateaway implementiran u programskom jeziku Python. Servis za korisnike/auth će, takođe, biti implementiran programskom jeziku Python i koristiće SQLite bazu podataka dok će se za ostale servise koristiti Rust programski jezik i PostgreSql za bazu.
 
 Frontend će biti implementiran korišćenjem React-a.
