@@ -8,3 +8,8 @@ def create_user():
     data = request.get_json()
     response = requests.post(f'{MICROSERVICE_URL}/users/register', json=data)
     return jsonify(response.json()), response.status_code
+
+def login_user():
+    data = request.get_json()
+    response = requests.post(f'{MICROSERVICE_URL}/users/login', json=data)
+    return jsonify(response.json()), response.status_code
