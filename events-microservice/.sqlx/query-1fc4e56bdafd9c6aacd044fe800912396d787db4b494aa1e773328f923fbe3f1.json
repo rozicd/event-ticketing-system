@@ -1,0 +1,92 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO events (id, name, begins, event_type, capacity_rows, capacity_columns, capacity, location_longitude, location_latitude, location_address, organizator_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "begins",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 3,
+        "name": "event_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "capacity_rows",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "capacity_columns",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "capacity",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "location_longitude",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 8,
+        "name": "location_latitude",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 9,
+        "name": "location_address",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "organizator_id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Timestamptz",
+        "Text",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Float8",
+        "Float8",
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "1fc4e56bdafd9c6aacd044fe800912396d787db4b494aa1e773328f923fbe3f1"
+}

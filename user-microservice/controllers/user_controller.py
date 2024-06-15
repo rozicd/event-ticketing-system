@@ -24,7 +24,7 @@ def login_user():
     user = user_service.find_by_email_and_password(data['email'], data['password'])
     if not user:
         return jsonify({"message": "Invalid email or password"}), 401
-    access_token = create_access_token(identity={'email': user['email'], 'role': user['role']})
+    access_token = create_access_token(identity={'id':user['id'],'email': user['email'], 'role': user['role']})
     return jsonify(access_token=access_token), 200
     
     
