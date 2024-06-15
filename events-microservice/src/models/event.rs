@@ -15,7 +15,8 @@ pub struct Event {
     pub location_longitude: f64,
     pub location_latitude: f64,
     pub location_address: String,
-    pub organizator_id: Uuid
+    pub organizator_id: Uuid,
+    pub canceled: bool,
 }
 #[derive(Debug, Deserialize)]
 pub struct CreateEvent {
@@ -29,4 +30,9 @@ pub struct CreateEvent {
     pub location_latitude: f64,
     pub location_address: String,
     pub organizator_id: Uuid
+}
+
+#[derive(Debug, Deserialize)]
+pub struct UpdateEvent{
+    pub user_id: Uuid
 }

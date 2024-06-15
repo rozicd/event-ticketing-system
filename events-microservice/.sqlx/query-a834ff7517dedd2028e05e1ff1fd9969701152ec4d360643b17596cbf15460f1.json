@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO events (id, name, begins, event_type, capacity_rows, capacity_columns, capacity, location_longitude, location_latitude, location_address, organizator_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *",
+  "query": "INSERT INTO events (id, name, begins, event_type, capacity_rows, capacity_columns, capacity, location_longitude, location_latitude, location_address, organizator_id, canceled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *",
   "describe": {
     "columns": [
       {
@@ -57,6 +57,11 @@
         "ordinal": 10,
         "name": "organizator_id",
         "type_info": "Uuid"
+      },
+      {
+        "ordinal": 11,
+        "name": "canceled",
+        "type_info": "Bool"
       }
     ],
     "parameters": {
@@ -71,7 +76,8 @@
         "Float8",
         "Float8",
         "Text",
-        "Uuid"
+        "Uuid",
+        "Bool"
       ]
     },
     "nullable": [
@@ -85,8 +91,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "1fc4e56bdafd9c6aacd044fe800912396d787db4b494aa1e773328f923fbe3f1"
+  "hash": "a834ff7517dedd2028e05e1ff1fd9969701152ec4d360643b17596cbf15460f1"
 }
