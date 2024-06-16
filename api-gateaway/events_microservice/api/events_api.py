@@ -10,3 +10,14 @@ def create_event():
     data['organizator_id'] = get_jwt_identity().get('id')
     response = requests.post(f'{MICROSERVICE_URL}/events', json=data)
     return jsonify(response.json()), response.status_code
+
+@jwt_required()
+def update_event(event_id):
+    data = request.get_json()
+    data['user_id'] = get_jwt_identity().get('id')
+    response = requests.put(f'{MICROSERVICE_URL}/events/{event_id}', json=data)
+    return jsonify(response.json()), response.status_code
+
+def get_events():
+    response = requests.get(f'{MICROSERVICE_URL}/events')
+    return jsonify(response.json()), response.status_code

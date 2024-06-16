@@ -1,7 +1,7 @@
 use crate::models::event::{Event, CreateEvent, UpdateEvent};
 use crate::AppState;
 
-use actix_web::{post, get, put, web, HttpResponse, Responder, delete};
+use actix_web::{post, get, put, web, HttpResponse, Responder};
 
 use uuid::Uuid;
 
