@@ -18,3 +18,9 @@ pub struct Event {
     pub organizator_id: Uuid,
     pub canceled: bool,
 }
+
+#[derive(Deserialize)]
+pub struct PaginationParams {
+    pub page: Option<u32>,
+    pub limit: Option<u32>,
+}
