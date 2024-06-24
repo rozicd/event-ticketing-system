@@ -3,8 +3,20 @@ from user_microservice.routes.user_api_bp import user_api_bp
 from events_microservice.routes.events_api_bp import events_api_bp
 from review_microservice.routes.reviews_api_bp import *
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
+from flask_cors import CORS
+
 
 app = Flask(__name__)
+
+CORS(app, resources={
+    r"/gateway/*": {
+        "origins": "http://localhost:3000",
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Authorization", "Content-Type"],
+        "supports_credentials": True
+    }
+})
+
 app.register_blueprint(user_api_bp, url_prefix='/gateway/users')
 app.register_blueprint(events_api_bp, url_prefix='/gateway/events')
 app.register_blueprint(reviews_api_bp, url_prefix='/gateway/reviews')
