@@ -3,6 +3,8 @@ use crate::AppState;
 
 use actix_web::{post, get, put, web, HttpResponse, Responder};
 
+use lapin::options::BasicPublishOptions;
+use lapin::BasicProperties;
 use uuid::Uuid;
 
 #[post("/events")]
@@ -27,10 +29,27 @@ async fn create_event(body: web::Json<CreateEvent>, data: web::Data<AppState>) -
     .await;
     match query_result {
         Ok(event) => {
-            let event_response = serde_json::json!({"status": "success", "data": serde_json::json!({
-                "event": event
-            })});
-            return HttpResponse::Ok().json(event_response);
+            let event_json = serde_json::to_string(&event).unwrap();
+            let publish_result = data.amqp_channel.basic_publish(
+                "",
+                "event_queue",
+                BasicPublishOptions::default(),
+                event_json.as_bytes(),
+                BasicProperties::default(),
+            )
+            .await;
+
+            match publish_result {
+                Ok(_) => {
+                    let event_response = serde_json::json!({"status": "success", "data": serde_json::json!({
+                        "event": event
+                    })});
+                    HttpResponse::Ok().json(event_response)
+                }
+                Err(e) => {
+                    HttpResponse::InternalServerError().json(serde_json::json!({"status": "error", "message": format!("Failed to publish event: {:?}", e)}))
+                }
+            }
         }
         Err(e) => {
             if e.to_string().contains("duplicate key value violates unique constraint") {

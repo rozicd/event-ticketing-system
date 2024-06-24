@@ -3,6 +3,8 @@ use sqlx::{Postgres, Pool, postgres::PgPoolOptions};
 use dotenv::dotenv;
 use std::env;
 use routes::config::config;
+use lapin::{options::*, types::FieldTable, Connection, ConnectionProperties, Channel};
+
 
 
 #[get("/")]
@@ -25,6 +27,7 @@ mod routes;
 
 pub struct AppState {
     db: Pool<Postgres>,
+    amqp_channel: Channel,
 }
 
 #[actix_web::main]
@@ -46,10 +49,19 @@ async fn main() -> std::io::Result<()> {
             std::process::exit(1);
         }
     };
+    let amqp_url = env::var("AMQP_URL").expect("AMQP_URL must be set");
+    let amqp_connection = Connection::connect(&amqp_url, ConnectionProperties::default()).await.expect("Failed to connect to RabbitMQ");
+    let amqp_channel = amqp_connection.create_channel().await.expect("Failed to create RabbitMQ channel");
+
+    let _ = amqp_channel.queue_declare(
+        "event_queue",
+        QueueDeclareOptions::default(),
+        FieldTable::default()
+    ).await.expect("Failed to declare RabbitMQ queue");
 
     HttpServer::new(move || {
         App::new()
-            .app_data(web::Data::new(AppState { db: pool.clone() }))
+            .app_data(web::Data::new(AppState { db: pool.clone(), amqp_channel: amqp_channel.clone() }))
             .configure(config)
             .service(hello)
             .service(echo)
