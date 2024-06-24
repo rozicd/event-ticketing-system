@@ -24,3 +24,9 @@ pub struct PaginationParams {
     pub page: Option<u32>,
     pub limit: Option<u32>,
 }
+#[derive(Serialize)]
+pub struct PaginatedResponse<T> {
+    pub items: Vec<T>,
+    pub total_items: i64,
+    pub total_pages: i64,
+}

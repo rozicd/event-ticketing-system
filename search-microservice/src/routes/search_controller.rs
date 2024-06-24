@@ -1,9 +1,9 @@
-use crate::models::event::{Event, PaginationParams};
+use crate::models::event::{Event, PaginationParams, PaginatedResponse};
 use crate::AppState;
 
 use actix_web::{post, get, put, web, HttpResponse, Responder};
 
-use sqlx::query_as;
+use sqlx::{query, query_as};
 use uuid::Uuid;
 
 #[get("/events")]
@@ -15,6 +15,23 @@ async fn get_paginated_events(
     let limit = params.limit.unwrap_or(5);
     let offset = (page - 1) * limit;
 
+    // Fetch the total number of events
+    let total_items = match query!(
+        r#"
+        SELECT COUNT(*) as count FROM events
+        "#
+    )
+    .fetch_one(&data.db)
+    .await
+    {
+        Ok(record) => record.count.unwrap_or(0),
+        Err(err) => {
+            println!("Failed to fetch total number of events: {:?}", err);
+            return HttpResponse::InternalServerError().finish();
+        }
+    };
+
+    // Fetch the paginated events
     let events = match query_as!(
         Event,
         r#"
@@ -36,5 +53,15 @@ async fn get_paginated_events(
         }
     };
 
-    HttpResponse::Ok().json(events)
+    // Calculate the total number of pages
+    let total_pages = (total_items as f64 / limit as f64).ceil() as i64;
+
+    // Create the response struct
+    let response = PaginatedResponse {
+        items: events,
+        total_items,
+        total_pages,
+    };
+
+    HttpResponse::Ok().json(response)
 }
