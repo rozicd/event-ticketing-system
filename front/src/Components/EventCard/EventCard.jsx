@@ -18,7 +18,7 @@ const EventCard = ({ pictureUrl, eventName }) => {
       >
         <Box
           component="img"
-          src={pictureUrl}
+          src={"http://localhost:5000/gateway/uploads/" + pictureUrl}
           alt={eventName}
           sx={{
             width: '90%',

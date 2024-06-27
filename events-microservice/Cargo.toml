@@ -17,3 +17,6 @@ uuid = { version = "1.8.0", features = ["serde", "v4"] }
 lapin = "2.3.4"
 tokio-amqp = "2.0.0"
 futures-lite = "2.3.0"
+sanitize-filename = "0.5"
+futures-util = "0.3"
+actix-multipart = "0.6.2"

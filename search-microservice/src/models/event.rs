@@ -16,7 +16,9 @@ pub struct Event {
     pub location_latitude: f64,
     pub location_address: String,
     pub organizator_id: Uuid,
+    pub organizator_name: String,
     pub canceled: bool,
+    pub image_path: Option<String>
 }
 
 #[derive(Deserialize)]

@@ -37,7 +37,7 @@ function Home() {
           {events.map((event) => (
             <Grid item key={event.id} xs={12} sm={6} md={4} lg={4}>
               <EventCard
-                pictureUrl={`https://example.com/${event.id}/image.jpg`} // Replace with actual picture URL logic
+                pictureUrl={event.image_path} // Replace with actual picture URL logic
                 eventName={event.name}
               />
             </Grid>

@@ -35,7 +35,7 @@ async fn get_paginated_events(
     let events = match query_as!(
         Event,
         r#"
-        SELECT id, name, begins, event_type, capacity_rows, capacity_columns, capacity, location_longitude, location_latitude, location_address, organizator_id, canceled
+        SELECT id, name, begins, event_type, capacity_rows, capacity_columns, capacity, location_longitude, location_latitude, location_address, organizator_id, organizator_name, canceled, image_path
         FROM events
         ORDER BY begins DESC
         LIMIT $1 OFFSET $2

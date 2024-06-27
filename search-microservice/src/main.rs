@@ -66,10 +66,7 @@ async fn process_event(event_json: &str, pool: &Pool<Postgres>) -> std::result::
 
     // Insert the event into the database
     query!(
-        r#"
-        INSERT INTO events (id, name, begins, event_type, capacity_rows, capacity_columns, capacity, location_longitude, location_latitude, location_address, organizator_id, canceled)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-        "#,
+        "INSERT INTO events (id, name, begins, event_type, capacity_rows, capacity_columns, capacity, location_longitude, location_latitude, location_address, organizator_id, organizator_name, canceled, image_path) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
         event.id,
         event.name,
         event.begins,
@@ -81,7 +78,9 @@ async fn process_event(event_json: &str, pool: &Pool<Postgres>) -> std::result::
         event.location_latitude,
         event.location_address,
         event.organizator_id,
-        event.canceled
+        event.organizator_name,
+        event.canceled,
+        event.image_path
     )
     .execute(pool)
     .await?;
