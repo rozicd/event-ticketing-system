@@ -3,16 +3,18 @@ use crate::AppState;
 
 use actix_web::{post, get, put, web, HttpResponse, Responder};
 
+use chrono::{DateTime, Utc};
 use lapin::options::BasicPublishOptions;
 use lapin::BasicProperties;
 use uuid::Uuid;
+
 
 #[post("/events")]
 async fn create_event(body: web::Json<CreateEvent>, data: web::Data<AppState>) -> impl Responder {
 
     let query_result = sqlx::query_as!(
         Event,
-        "INSERT INTO events (id, name, begins, event_type, capacity_rows, capacity_columns, capacity, location_longitude, location_latitude, location_address, organizator_id, canceled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *",
+        "INSERT INTO events (id, name, begins, event_type, capacity_rows, capacity_columns, capacity, location_longitude, location_latitude, location_address, organizator_id, organizator_name, canceled, image_path) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *",
         Uuid::new_v4(),
         body.name.clone(),
         Some(body.begins),
@@ -24,7 +26,9 @@ async fn create_event(body: web::Json<CreateEvent>, data: web::Data<AppState>) -
         body.location_latitude,
         body.location_address,
         body.organizator_id,
-        false
+        body.organizator_name.clone(),
+        false,
+        body.image_path.clone()
     ).fetch_one(&data.db)
     .await;
     match query_result {

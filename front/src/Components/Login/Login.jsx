@@ -1,16 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Button, TextField, Typography, Container, Paper, Link } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
+import { loginUser } from '../services/UserService';
+import { useNavigate } from 'react-router-dom';
 
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-  const handleLogin = () => {
-    // Handle login logic here
+
+  const handleLogin = async () => {
+
     console.log('Email:', email);
     console.log('Password:', password);
+    try{
+      const response = await loginUser({ email, password });
+      console.log('Response:', response);
+      localStorage.setItem('token', response.access_token);
+      window.location.reload();
+
+    }catch(error){
+      window.alert(error);
+    }
+
   };
 
   return (

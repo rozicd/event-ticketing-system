@@ -17,6 +17,7 @@ def create_user():
         "email": data['email'],
         "role": "USER"
     }
+    user_service.create_user(user)
     return jsonify({"message": "User created successfully"}), 201
 
 def login_user():
@@ -24,7 +25,7 @@ def login_user():
     user = user_service.find_by_email_and_password(data['email'], data['password'])
     if not user:
         return jsonify({"message": "Invalid email or password"}), 401
-    access_token = create_access_token(identity={'id':user['id'],'email': user['email'], 'role': user['role']})
+    access_token = create_access_token(identity={'id':user['id'],'email': user['email'], 'role': user['role'], 'name': user['name'], 'surname': user['surname']})
     return jsonify(access_token=access_token), 200
     
     
