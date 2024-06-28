@@ -10,7 +10,8 @@ import { Route, Routes } from 'react-router-dom';
 import {jwtDecode}  from 'jwt-decode';
 import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router';
-
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 function App() {
   const [loggedUser, setLoggedUser] = useState(null);
 
@@ -26,7 +27,10 @@ function App() {
     }
   }, []);  
   return (
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+
     <div>
+
       <Navbar loggedUser={loggedUser} />
       <Routes>
         <Route path="/" element={<Navigate to="/home" />} />
@@ -37,6 +41,7 @@ function App() {
         <Route path="/register" element={loggedUser ? <Navigate to="/home" /> : <Register />}  />
       </Routes>
     </div>
+    </LocalizationProvider>
   );
 }
 
