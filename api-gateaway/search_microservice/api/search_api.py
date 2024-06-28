@@ -11,7 +11,7 @@ def fetch_events():
     category = request.args.get('category', None)
     sort_order = request.args.get('sort_order', None)
     event_type = request.args.get('event_type', None)
-    
+    print(sort_order)
     
     response = requests.get(f'{MICROSERVICE_URL}/events', params={'page': page, 'limit': limit, 'search_term': search, 'category': category, 'sort_order': sort_order, 'event_type': event_type})
 

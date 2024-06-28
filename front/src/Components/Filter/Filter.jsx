@@ -24,7 +24,7 @@ const FilterComponent = ({ onChange }) => {
 
   const handleSortOrderChange = (e) => {
     setSortOrder(e.target.value);
-    onChange({ searchTerm, category, type, priceOrder: e.target.value });
+    onChange({ searchTerm, category, type, sortOrder: e.target.value });
   };
 
   return (
@@ -47,8 +47,8 @@ const FilterComponent = ({ onChange }) => {
             <MenuItem value="">
               <em>None</em>
             </MenuItem>
-            <MenuItem value="name">Name</MenuItem>
-            <MenuItem value="organizator_name">Organizator</MenuItem>
+            <MenuItem value="Name">Name</MenuItem>
+            <MenuItem value="Organizator">Organizator</MenuItem>
           </Select>
         </FormControl>
       </Box>

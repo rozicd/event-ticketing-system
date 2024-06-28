@@ -12,14 +12,14 @@ function Home() {
     const [filters, setFilters] = useState({
       searchTerm: '',
       category: '',
-      event_type: '',
+      type: '',
       sortOrder: '',
     });
   
     useEffect(() => {
       const fetchEvents = async () => {
         try {
-          const response = await getPaginatedEvents(page, 5,filters.searchTerm, filters.category, filters.event_type, filters.sortOrder);
+          const response = await getPaginatedEvents(page, 4,filters.searchTerm, filters.category, filters.type, filters.sortOrder);
           setEvents(response.items);
           setTotalPages(response.total_pages);
           console.log('Events:', response);
@@ -44,10 +44,10 @@ function Home() {
     <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "20px" }}>
         <Filter onChange={handleFilterChange}/>
       <Pagination count={totalPages} onChange={handleChange} sx={{ margin: "20px" }} />
-      <Box p={2} width="100%" maxWidth="1200px">
-        <Grid container spacing={6} justifyContent="center">
+      <Box p={2} width="100%" maxWidth="1200px" sx={{marginLeft:"130px", display: "flex", justifyContent: "center" }}>
+        <Grid container rowSpacing={2} columnSpacing={{ xs: 1, sm: 2, md: 3 }} justifyContent="center"> 
           {events.map((event) => (
-            <Grid item key={event.id} xs={12} sm={6} md={4} lg={4}>
+            <Grid item key={event.id} xs={6} >
               <EventCard
                 pictureUrl={event.image_path} // Replace with actual picture URL logic
                 eventName={event.name}
