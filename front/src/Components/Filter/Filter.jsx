@@ -1,34 +1,54 @@
 import React from 'react';
-import { Box, TextField, FormControl, InputLabel, MenuItem, Select, Typography, Paper } from '@mui/material';
+import { Box, TextField, FormControl, InputLabel, MenuItem, Select, Paper } from '@mui/material';
 
-const FilterComponent = () => {
+const FilterComponent = ({ onChange }) => {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [category, setCategory] = React.useState('');
   const [type, setType] = React.useState('');
   const [priceOrder, setSortOrder] = React.useState('');
 
+  const handleSearchTermChange = (e) => {
+    setSearchTerm(e.target.value);
+    onChange({ searchTerm: e.target.value, category, type, priceOrder });
+  };
+
+  const handleCategoryChange = (e) => {
+    setCategory(e.target.value);
+    onChange({ searchTerm, category: e.target.value, type, priceOrder });
+  };
+
+  const handleTypeChange = (e) => {
+    setType(e.target.value);
+    onChange({ searchTerm, category, type: e.target.value, priceOrder });
+  };
+
+  const handleSortOrderChange = (e) => {
+    setSortOrder(e.target.value);
+    onChange({ searchTerm, category, type, priceOrder: e.target.value });
+  };
+
   return (
-    <Paper sx={{ p: 3, boxShadow: 3, borderRadius: 2, marginTop:"20px" }}>
+    <Paper sx={{ p: 3, boxShadow: 3, borderRadius: 2, marginTop: "20px" }}>
       <Box sx={{ display: 'flex', gap: 2 }}>
         <TextField
           label="Search"
           variant="outlined"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={handleSearchTermChange}
           sx={{ flex: 1 }}
         />
         <FormControl sx={{ minWidth: 150 }}>
           <InputLabel>Search by</InputLabel>
           <Select
             value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            onChange={handleCategoryChange}
             label="Category"
           >
             <MenuItem value="">
               <em>None</em>
             </MenuItem>
-            <MenuItem value="category1">City</MenuItem>
-            <MenuItem value="category2">Organizator</MenuItem>
+            <MenuItem value="name">Name</MenuItem>
+            <MenuItem value="organizator_name">Organizator</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -37,35 +57,31 @@ const FilterComponent = () => {
           <InputLabel>Type</InputLabel>
           <Select
             value={type}
-            onChange={(e) => setType(e.target.value)}
+            onChange={handleTypeChange}
             label="Type"
           >
             <MenuItem value="">
               <em>None</em>
             </MenuItem>
-            <MenuItem value="type1">Concert</MenuItem>
-            <MenuItem value="type2">Festival</MenuItem>
-            <MenuItem value="type3">Theatrical play</MenuItem>
+            <MenuItem value="Concert">Concert</MenuItem>
+            <MenuItem value="Festival">Festival</MenuItem>
+            <MenuItem value="Theatrical play">Theatrical play</MenuItem>
           </Select>
         </FormControl>
         <FormControl sx={{ flex: 1 }}>
           <InputLabel>Sort</InputLabel>
           <Select
             value={priceOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            label="Price"
+            onChange={handleSortOrderChange}
+            label="Sort"
           >
             <MenuItem value="">
               <em>None</em>
             </MenuItem>
-            <MenuItem value="pricacs">Price ascending</MenuItem>
-            <MenuItem value="pricedesc">Price descending</MenuItem>
-            <MenuItem value="spacedesc">Free space ascending</MenuItem>
-            <MenuItem value="spacedesc">Free space descending</MenuItem>
-            
+            <MenuItem value="capacity ASC">Free space ascending</MenuItem>
+            <MenuItem value="capacity DESC">Free space descending</MenuItem>
           </Select>
         </FormControl>
-        
       </Box>
     </Paper>
   );

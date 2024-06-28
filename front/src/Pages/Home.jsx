@@ -9,10 +9,17 @@ function Home() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
   
+    const [filters, setFilters] = useState({
+      searchTerm: '',
+      category: '',
+      event_type: '',
+      sortOrder: '',
+    });
+  
     useEffect(() => {
       const fetchEvents = async () => {
         try {
-          const response = await getPaginatedEvents(page);
+          const response = await getPaginatedEvents(page, 5,filters.searchTerm, filters.category, filters.event_type, filters.sortOrder);
           setEvents(response.items);
           setTotalPages(response.total_pages);
           console.log('Events:', response);
@@ -22,15 +29,20 @@ function Home() {
       };
   
       fetchEvents();
-    }, [page]);
+    }, [page, filters]);
   
     const handleChange = (event, value) => {
         setPage(value);
     }
 
+    const handleFilterChange = (newFilters) => {
+      setFilters(newFilters);
+      setPage(1); // Reset page to 1 when filters change
+    };
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "20px" }}>
-        <Filter />
+        <Filter onChange={handleFilterChange}/>
       <Pagination count={totalPages} onChange={handleChange} sx={{ margin: "20px" }} />
       <Box p={2} width="100%" maxWidth="1200px">
         <Grid container spacing={6} justifyContent="center">

@@ -21,14 +21,19 @@ pub struct Event {
     pub image_path: Option<String>
 }
 
-#[derive(Deserialize)]
-pub struct PaginationParams {
-    pub page: Option<u32>,
-    pub limit: Option<u32>,
-}
+
 #[derive(Serialize)]
 pub struct PaginatedResponse<T> {
     pub items: Vec<T>,
     pub total_items: i64,
     pub total_pages: i64,
+}
+#[derive(Deserialize)]
+pub struct EventFilters {
+    pub page: Option<u32>,
+    pub limit: Option<u32>,
+    pub search_term: Option<String>,
+    pub sort_order: Option<String>,
+    pub event_type: Option<String>,
+    pub category: Option<String>,
 }
