@@ -11,6 +11,8 @@ import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import 'leaflet/dist/leaflet.css';
 import NumberInputDialog from '../Components/Dialogs/NumberInputDialog';
 import { createTicket } from '../Components/services/EventSevice';
+import EqualizerOutlinedIcon from '@mui/icons-material/EqualizerOutlined';
+import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
 
 // Component to update map view
 const MapViewUpdater = ({ center }) => {
@@ -37,6 +39,10 @@ const EventPage = () => {
 
   const handleOpenDialog = () => {
     setOpen(true);
+  };
+  const getArcLabel = (params) => {
+    const percent = params.value / (event.capacity_columns*event.capacity_rows);
+    return `${(percent * 100).toFixed(0)}%`;
   };
 
   const handleConfirmDialog = async (quantity) => {
@@ -78,6 +84,7 @@ const EventPage = () => {
   };
 
   return (
+    <Box width="100%" height="100%" sx={{display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center"}}>
     <Box width="100%" height="100%" sx={{display:"flex", flexDirection:"row", justifyContent:"center"}}>
       <Paper
         elevation={3}
@@ -201,6 +208,48 @@ const EventPage = () => {
       </Paper>
       </Box>
       <NumberInputDialog open={open} onClose={handleCloseDialog} onConfirm={handleConfirmDialog} />
+    </Box>
+    <Paper
+        elevation={3}
+        sx={{
+          width: "50%",
+          height: '600px',
+          borderRadius: 6,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.3)',
+          padding: 2,
+          marginRight:"20px",
+           marginTop:"20px"
+        }}
+      >
+        <Box sx={{display:"flex", alignItems:"center"}}>
+        <EqualizerOutlinedIcon  />
+        <Typography variant="h4" mt={2} fontStyle="italic" sx={{ width: '100%', px: 2, marginTop:"2px"}}>Metrics</Typography>
+        </Box>
+        <PieChart
+          series={[
+            {
+              data: [
+                { id: 0, value: event.capacity_rows*event.capacity_columns-event.capacity, label: 'Sold' },
+                { id: 1, value: event.capacity, label: 'Remaining' },
+                
+              ],
+              arcLabel: getArcLabel,
+              
+            },
+          ]}
+          width={450}
+          height={300}
+          sx={{
+            [`& .${pieArcLabelClasses.root}`]: {
+              fill: 'white',
+              fontSize: 14,
+            },
+          }}
+           />
+      </Paper>
     </Box>
   );
 };
