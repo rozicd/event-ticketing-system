@@ -1,9 +1,18 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { Box, Typography, Container, Paper } from '@mui/material';
 
-const EventCard = ({ pictureUrl, eventName }) => {
+const EventCard = ({ event }) => {
+
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`event/${event.id}`);
+  };
+
   return (
-    <Container x={{ marginTop: "10px" }}>
+    <Container x={{ marginTop: "10px" }} onClick={handleClick}>
       <Paper
         elevation={3}
         sx={{
@@ -18,8 +27,8 @@ const EventCard = ({ pictureUrl, eventName }) => {
       >
         <Box
           component="img"
-          src={"http://localhost:5000/gateway/uploads/" + pictureUrl}
-          alt={eventName}
+          src={"http://localhost:5000/gateway/uploads/" + event.image_path}
+          alt={event.name}
           sx={{
             width: '90%',
             height: '60%', // Fixed image height
@@ -29,7 +38,7 @@ const EventCard = ({ pictureUrl, eventName }) => {
           }}
         />
         <Typography variant="h5" mt={2} textAlign="center" sx={{ width: '100%', px: 2 }}>
-          {eventName}
+          {event.name}
         </Typography>
       </Paper>
     </Container>

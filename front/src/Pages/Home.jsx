@@ -3,7 +3,6 @@ import EventCard from '../Components/EventCard/EventCard';
 import { getPaginatedEvents } from '../Components/services/EventSevice';
 import { Box, Grid, Pagination } from '@mui/material';
 import Filter from '../Components/Filter/Filter';
-
 function Home() {
     const [events, setEvents] = useState([]);
     const [page, setPage] = useState(1);
@@ -49,8 +48,7 @@ function Home() {
           {events.map((event) => (
             <Grid item key={event.id} xs={6} >
               <EventCard
-                pictureUrl={event.image_path} // Replace with actual picture URL logic
-                eventName={event.name}
+                event={event}
               />
             </Grid>
           ))}

@@ -32,3 +32,13 @@ export const createEvent = async (formData) => {
     }
     
   };
+
+export const getEvent = async (id) => {
+    try {
+      const response = await axios.get(`${EVENT_API_URL}/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch event:', error);
+      throw error;
+    }
+  }
