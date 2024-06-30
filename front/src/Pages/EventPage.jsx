@@ -9,6 +9,8 @@ import Groups2Icon from '@mui/icons-material/Groups2';
 import TheaterComedyIcon from '@mui/icons-material/TheaterComedy';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import 'leaflet/dist/leaflet.css';
+import NumberInputDialog from '../Components/Dialogs/NumberInputDialog';
+import { createTicket } from '../Components/services/EventSevice';
 
 // Component to update map view
 const MapViewUpdater = ({ center }) => {
@@ -27,6 +29,25 @@ const EventPage = () => {
   const [location, setLocation] = useState({ lat: 0, lng: 0 });
   const [covnertedDate, setConvertedDate] = useState("");
   const [convertedTime, setConvertedTime] = useState("");
+  const [open, setOpen] = useState(false);
+
+  const handleCloseDialog = () => {
+    setOpen(false);
+  };
+
+  const handleOpenDialog = () => {
+    setOpen(true);
+  };
+
+  const handleConfirmDialog = async (quantity) => {
+    try{
+      await createTicket(quantity, id);
+      window.alert("Ticket created successfully");
+      window.location.reload();
+    }catch(error){
+      window.alert("Failed to create ticket");
+    }
+  };
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -160,7 +181,7 @@ const EventPage = () => {
         <Typography variant="h6" mt={2}  sx={{ width: '100%', px: 2, marginTop:"2px"}}>{event.capacity}</Typography>
         </Box>
       </Box>
-      <Button variant='contained' sx={{marginBottom:"0", marginTop:"30px"}}>Buy ticket</Button>
+      <Button variant='contained' sx={{marginBottom:"0", marginTop:"30px"} } onClick={handleOpenDialog}>Buy ticket</Button>
       </Paper>
       <Paper
         elevation={3}
@@ -179,6 +200,7 @@ const EventPage = () => {
 
       </Paper>
       </Box>
+      <NumberInputDialog open={open} onClose={handleCloseDialog} onConfirm={handleConfirmDialog} />
     </Box>
   );
 };

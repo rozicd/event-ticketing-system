@@ -42,3 +42,18 @@ export const getEvent = async (id) => {
       throw error;
     }
   }
+
+export const createTicket = async (quantity, event_id) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.post(`${EVENT_API_URL}/create-ticket`, {event_id, quantity}, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to create ticket:', error);
+      throw error;
+    }
+  }
