@@ -29,6 +29,10 @@ def get_events():
     return jsonify(response.json()), response.status_code
 
 
+def get_event(event_id):
+    response = requests.get(f'{MICROSERVICE_URL}/events/{event_id}')
+    return jsonify(response.json()), response.status_code
+
 @jwt_required()
 def create_event():
     data = request.form.to_dict()

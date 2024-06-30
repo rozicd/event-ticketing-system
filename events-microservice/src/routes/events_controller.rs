@@ -145,6 +145,37 @@ async fn update_event(
     }
 }
 
+#[get("/events/{id}")]
+async fn get_event_by_id(
+    path: web::Path<Uuid>,
+    data: web::Data<AppState>,
+) -> impl Responder {
+    let id = path.into_inner();
+    let event = sqlx::query_as!(
+        Event,
+        "SELECT * FROM events WHERE id = $1",
+        id
+    )
+    .fetch_optional(&data.db)
+    .await;
+    match event {
+        Ok(Some(event)) => {
+            let event_response = serde_json::json!({"status": "success", "data": serde_json::json!({
+                "event": event
+            })});
+            HttpResponse::Ok().json(event_response)
+        }
+        Ok(None) => {
+            HttpResponse::NotFound()
+                .json(serde_json::json!({"status": "fail", "message": "Event not found"}))
+        }
+        Err(e) => {
+            HttpResponse::InternalServerError()
+                .json(serde_json::json!({"status": "error", "message": format!("{:?}", e)}))
+        }
+    }
+}
+
 #[get("/events")]
 async fn get_events(data: web::Data<AppState>) -> impl Responder {
     let query_result = sqlx::query_as!(
