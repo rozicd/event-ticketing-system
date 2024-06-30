@@ -64,9 +64,24 @@ async fn process_event(event_json: &str, pool: &Pool<Postgres>) -> std::result::
         }
     };
 
-    // Insert the event into the database
+    // Use INSERT ... ON CONFLICT to insert or update the event
     query!(
-        "INSERT INTO events (id, name, begins, event_type, capacity_rows, capacity_columns, capacity, location_longitude, location_latitude, location_address, organizator_id, organizator_name, canceled, image_path) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+        "INSERT INTO events (id, name, begins, event_type, capacity_rows, capacity_columns, capacity, location_longitude, location_latitude, location_address, organizator_id, organizator_name, canceled, image_path)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+         ON CONFLICT (id) DO UPDATE
+         SET name = EXCLUDED.name,
+             begins = EXCLUDED.begins,
+             event_type = EXCLUDED.event_type,
+             capacity_rows = EXCLUDED.capacity_rows,
+             capacity_columns = EXCLUDED.capacity_columns,
+             capacity = EXCLUDED.capacity,
+             location_longitude = EXCLUDED.location_longitude,
+             location_latitude = EXCLUDED.location_latitude,
+             location_address = EXCLUDED.location_address,
+             organizator_id = EXCLUDED.organizator_id,
+             organizator_name = EXCLUDED.organizator_name,
+             canceled = EXCLUDED.canceled,
+             image_path = EXCLUDED.image_path",
         event.id,
         event.name,
         event.begins,
@@ -87,7 +102,6 @@ async fn process_event(event_json: &str, pool: &Pool<Postgres>) -> std::result::
 
     Ok(())
 }
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();

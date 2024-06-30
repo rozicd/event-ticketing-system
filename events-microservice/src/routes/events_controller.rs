@@ -1,4 +1,5 @@
 use crate::models::event::{Event, CreateEvent, UpdateEvent};
+use crate::models::ticket::{Ticket, CreateTicket};
 use crate::AppState;
 
 use actix_web::{post, get, put, web, HttpResponse, Responder};
@@ -198,3 +199,148 @@ async fn get_events(data: web::Data<AppState>) -> impl Responder {
     }
 }
 
+#[post("/tickets")]
+async fn create_ticket(
+    body: web::Json<CreateTicket>,
+    data: web::Data<AppState>,
+) -> impl Responder {
+    // Start a transaction
+    let mut transaction = match data.db.begin().await {
+        Ok(tx) => tx,
+        Err(e) => {
+            return HttpResponse::InternalServerError().json(serde_json::json!({
+                "status": "error",
+                "message": format!("Failed to start transaction: {:?}", e)
+            }));
+        }
+    };
+
+    // Check if the event_id exists in the events table
+    let event_result = sqlx::query!(
+        "SELECT id, capacity FROM events WHERE id = $1 FOR UPDATE",
+        &body.event_id
+    )
+    .fetch_optional(&mut *transaction) // Dereference the transaction
+    .await;
+
+    match event_result {
+        Ok(Some(event)) => {
+            let available_capacity = event.capacity - body.quantity.unwrap_or(0);
+            if available_capacity >= 0 {
+                // Proceed with ticket creation
+                let query_result = sqlx::query_as!(
+                    Ticket,
+                    "INSERT INTO tickets (id, event_id, user_id, quantity, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+                    Uuid::new_v4(),
+                    body.event_id,
+                    body.user_id,
+                    body.quantity,
+                    chrono::Utc::now()
+                )
+                .fetch_one(&mut *transaction) // Dereference the transaction
+                .await;
+
+                match query_result {
+                    Ok(ticket) => {
+                        // Update event capacity in the database and return the updated event
+                        let update_result = sqlx::query_as!(
+                            Event,
+                            "UPDATE events SET capacity = $1 WHERE id = $2 RETURNING *",
+                            available_capacity,
+                            event.id
+                        )
+                        .fetch_one(&mut *transaction) // Dereference the transaction
+                        .await;
+
+                        match update_result {
+                            Ok(updated_event) => {
+                                // Commit the transaction
+                                if let Err(e) = transaction.commit().await {
+                                    return HttpResponse::InternalServerError().json(serde_json::json!({
+                                        "status": "error",
+                                        "message": format!("Failed to commit transaction: {:?}", e)
+                                    }));
+                                }
+
+                                // Send the updated event to the event queue
+                                let event_json = serde_json::to_string(&updated_event).unwrap();
+                                let publish_result = data.amqp_channel.basic_publish(
+                                    "",
+                                    "event_queue",
+                                    BasicPublishOptions::default(),
+                                    event_json.as_bytes(),
+                                    BasicProperties::default(),
+                                )
+                                .await;
+
+                                match publish_result {
+                                    Ok(_) => {
+                                        let ticket_response = serde_json::json!({
+                                            "status": "success",
+                                            "data": {
+                                                "ticket": ticket
+                                            }
+                                        });
+                                        HttpResponse::Ok().json(ticket_response)
+                                    }
+                                    Err(e) => {
+                                        HttpResponse::InternalServerError().json(serde_json::json!({
+                                            "status": "error",
+                                            "message": format!("Failed to publish event: {:?}", e)
+                                        }))
+                                    }
+                                }
+                            }
+                            Err(e) => {
+                                // Rollback transaction on update failure
+                                let _ = transaction.rollback().await;
+                                HttpResponse::InternalServerError().json(serde_json::json!({
+                                    "status": "error",
+                                    "message": format!("Failed to update event capacity: {:?}", e)
+                                }))
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        // Rollback transaction on ticket creation failure
+                        let _ = transaction.rollback().await;
+                        if e.to_string().contains("duplicate key value violates unique constraint") {
+                            HttpResponse::BadRequest().json(serde_json::json!({
+                                "status": "fail",
+                                "message": "Duplicate Key"
+                            }))
+                        } else {
+                            HttpResponse::InternalServerError().json(serde_json::json!({
+                                "status": "error",
+                                "message": format!("{:?}", e)
+                            }))
+                        }
+                    }
+                }
+            } else {
+                // Insufficient capacity
+                let _ = transaction.rollback().await;
+                HttpResponse::BadRequest().json(serde_json::json!({
+                    "status": "fail",
+                    "message": "Insufficient capacity for this event"
+                }))
+            }
+        }
+        Ok(None) => {
+            // Event not found
+            let _ = transaction.rollback().await;
+            HttpResponse::BadRequest().json(serde_json::json!({
+                "status": "fail",
+                "message": "Event with the provided event_id does not exist"
+            }))
+        }
+        Err(e) => {
+            // Database query error
+            let _ = transaction.rollback().await;
+            HttpResponse::InternalServerError().json(serde_json::json!({
+                "status": "error",
+                "message": format!("{:?}", e)
+            }))
+        }
+    }
+}
