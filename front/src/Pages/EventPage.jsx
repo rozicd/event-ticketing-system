@@ -16,7 +16,7 @@ import EqualizerOutlinedIcon from '@mui/icons-material/EqualizerOutlined';
 import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { getEventAnalitics } from '../Components/services/AnaliticsService';
-
+import ReviewDialog from '../Components/Dialogs/ReviewDialog';
 
 // Component to update map view
 const MapViewUpdater = ({ center }) => {
@@ -36,10 +36,12 @@ const EventPage = () => {
   const [covnertedDate, setConvertedDate] = useState("");
   const [convertedTime, setConvertedTime] = useState("");
   const [open, setOpen] = useState(false);
+  const [openReview, setOpenReview] = useState(false);
   const [dates, setDates] = useState([]);
   const [values, setValues] = useState([]);
   const [timeRange, setTimeRange] = useState('weekly');
   const [userId, setUserId] = useState("");
+  const [isPastEvent, setIsPastEvent] = useState(false);
 
   const extractUserIdFromJWT = () => {
     const token = localStorage.getItem('token'); // Assuming the JWT is stored in localStorage
@@ -50,6 +52,13 @@ const EventPage = () => {
     }
   };
   
+  const openReviewDialog = () => {
+    setOpenReview(true);
+  }
+  const closeReviewDialog = () => {
+    setOpenReview(false);
+  }
+
   const handleCancelEvent = async () => {
     try {
       await cancelEvent(id);
@@ -109,6 +118,9 @@ const EventPage = () => {
           lng: response.data.event.location_longitude
         });
         convertIsoDateTime(response.data.event.begins);
+        const today = new Date().toISOString();
+        const eventDate = new Date(response.data.event.begins).toISOString();
+        setIsPastEvent(eventDate.slice(0, 10) < today.slice(0, 10));
       } catch (error) {
         console.error('Failed to fetch event:', error);
       }
@@ -236,7 +248,11 @@ const EventPage = () => {
       {userId === event.organizator_id ? (
         <Button variant='contained' sx={{ marginBottom: "0", marginTop: "30px" }} onClick={handleCancelEvent}>Cancel Event</Button>
       ) : (
-        <Button variant='contained' sx={{ marginBottom: "0", marginTop: "30px" }} onClick={handleOpenDialog}>Buy Ticket</Button>
+        isPastEvent ? (
+          <Button variant='contained' sx={{ marginBottom: "0", marginTop: "30px" }} onClick={openReviewDialog}>Review</Button>
+        ) : (
+          <Button variant='contained' sx={{ marginBottom: "0", marginTop: "30px" }} onClick={handleOpenDialog}>Buy Ticket</Button>
+        )
       )}
       </Paper>
       <Paper
@@ -257,6 +273,7 @@ const EventPage = () => {
       </Paper>
       </Box>
       <NumberInputDialog open={open} onClose={handleCloseDialog} onConfirm={handleConfirmDialog} />
+      <ReviewDialog open={openReview} onClose={closeReviewDialog} eventId={id} />
     </Box>
     {userId === event.organizator_id && (
     <Paper
