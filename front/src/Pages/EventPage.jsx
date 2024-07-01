@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Paper, Typography } from '@mui/material';
+import { Box, Button, Paper, Typography, Select, MenuItem } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { getEvent } from '../Components/services/EventSevice';
+import {jwtDecode} from 'jwt-decode';
+import { getEvent, cancelEvent } from '../Components/services/EventSevice';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -13,6 +14,9 @@ import NumberInputDialog from '../Components/Dialogs/NumberInputDialog';
 import { createTicket } from '../Components/services/EventSevice';
 import EqualizerOutlinedIcon from '@mui/icons-material/EqualizerOutlined';
 import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
+import { BarChart } from '@mui/x-charts/BarChart';
+import { getEventAnalitics } from '../Components/services/AnaliticsService';
+
 
 // Component to update map view
 const MapViewUpdater = ({ center }) => {
@@ -32,6 +36,29 @@ const EventPage = () => {
   const [covnertedDate, setConvertedDate] = useState("");
   const [convertedTime, setConvertedTime] = useState("");
   const [open, setOpen] = useState(false);
+  const [dates, setDates] = useState([]);
+  const [values, setValues] = useState([]);
+  const [timeRange, setTimeRange] = useState('weekly');
+  const [userId, setUserId] = useState("");
+
+  const extractUserIdFromJWT = () => {
+    const token = localStorage.getItem('token'); // Assuming the JWT is stored in localStorage
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      console.log("id", decodedToken.sub.id)
+      setUserId(decodedToken.sub.id);
+    }
+  };
+  
+  const handleCancelEvent = async () => {
+    try {
+      await cancelEvent(id);
+      window.alert("Event canceled successfully");
+      window.location.reload();
+    } catch (error) {
+      window.alert("Failed to cancel event");
+    }
+  };
 
   const handleCloseDialog = () => {
     setOpen(false);
@@ -55,6 +82,23 @@ const EventPage = () => {
     }
   };
 
+  const fetchAnalitics = async (range) => {
+    try {
+      const response = await getEventAnalitics(range, id);
+      console.log("response", response);
+
+      // Process dates and values
+      if (response.length > 0) {
+        const fetchedDates = response.map(item => new Date(item.date).toLocaleDateString());
+        const fetchedValues = response.map(item => item.total_quantity);
+        setDates(fetchedDates);
+        setValues(fetchedValues);
+      }
+    } catch (error) {
+      console.error('Failed to fetch event analytics:', error);
+    }
+  };
+
   useEffect(() => {
     const fetchEvent = async () => {
       try {
@@ -64,14 +108,15 @@ const EventPage = () => {
           lat: response.data.event.location_latitude,
           lng: response.data.event.location_longitude
         });
-        convertIsoDateTime(event.begins);
+        convertIsoDateTime(response.data.event.begins);
       } catch (error) {
         console.error('Failed to fetch event:', error);
       }
     };
+    extractUserIdFromJWT();
     fetchEvent();
-    
-  }, [id]);
+    fetchAnalitics(timeRange);
+  }, [id, timeRange]);
 
   const convertIsoDateTime = (isoDateTime) => {
     const date = new Date(isoDateTime);
@@ -185,10 +230,14 @@ const EventPage = () => {
         <Groups2Icon  />
         <Box sx={{displat:"flex", flexDirection:"column"}}>
         <Typography variant="h8" mt={2}  sx={{ width: '100%', px: 2 }}>Remaining tickers</Typography>
-        <Typography variant="h6" mt={2}  sx={{ width: '100%', px: 2, marginTop:"2px"}}>{event.capacity}</Typography>
+        {event.canceled ? <Typography variant="h6" mt={2}  sx={{ width: '100%', px: 2, marginTop:"2px", color:"red"}}>CANCELED</Typography> : (<Typography variant="h6" mt={2}  sx={{ width: '100%', px: 2, marginTop:"2px"}}>{event.capacity}</Typography>)}
         </Box>
       </Box>
-      <Button variant='contained' sx={{marginBottom:"0", marginTop:"30px"} } onClick={handleOpenDialog}>Buy ticket</Button>
+      {userId === event.organizator_id ? (
+        <Button variant='contained' sx={{ marginBottom: "0", marginTop: "30px" }} onClick={handleCancelEvent}>Cancel Event</Button>
+      ) : (
+        <Button variant='contained' sx={{ marginBottom: "0", marginTop: "30px" }} onClick={handleOpenDialog}>Buy Ticket</Button>
+      )}
       </Paper>
       <Paper
         elevation={3}
@@ -209,6 +258,7 @@ const EventPage = () => {
       </Box>
       <NumberInputDialog open={open} onClose={handleCloseDialog} onConfirm={handleConfirmDialog} />
     </Box>
+    {userId === event.organizator_id && (
     <Paper
         elevation={3}
         sx={{
@@ -249,7 +299,27 @@ const EventPage = () => {
             },
           }}
            />
-      </Paper>
+          {dates.length > 0 && values.length > 0 && (
+            <BarChart
+              series={[
+                { data: values },
+              ]}
+              height={250}
+              xAxis={[{ data: dates, scaleType: 'band' }]}
+              margin={{ top: 10, bottom: 30, left: 40, right: 10 }}
+            />
+          )}
+      <Typography variant="h6" mt={2} mb={2}>Select Time Range</Typography>
+      <Select
+        value={timeRange}
+        onChange={(e) => setTimeRange(e.target.value)}
+        sx={{ width: "80%", marginBottom: 2 }}
+      >
+        <MenuItem value="weekly">Weekly</MenuItem>
+        <MenuItem value="monthly">Monthly</MenuItem>
+        <MenuItem value="yearly">Yearly</MenuItem>
+      </Select>
+      </Paper>)}
     </Box>
   );
 };

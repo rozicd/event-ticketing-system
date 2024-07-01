@@ -58,6 +58,12 @@ async fn main() -> std::io::Result<()> {
         QueueDeclareOptions::default(),
         FieldTable::default()
     ).await.expect("Failed to declare RabbitMQ queue");
+    
+    let _ = amqp_channel.queue_declare(
+        "tickets_queue",
+        QueueDeclareOptions::default(),
+        FieldTable::default()
+    ).await.expect("Failed to declare RabbitMQ queue");
 
     HttpServer::new(move || {
         App::new()

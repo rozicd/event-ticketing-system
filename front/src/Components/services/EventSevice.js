@@ -16,6 +16,21 @@ export const getPaginatedEvents = async (page = 1, limit = 5, search_term, categ
     }
   };
 
+export const cancelEvent = async (id) => {
+  const token = localStorage.getItem('token');
+  try{
+    const response = await axios.put(`${EVENT_API_URL}/update-event/${id}`, {}, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    return response;
+  }catch(error){
+      console.error('Failed to cancel event:', error);
+      throw error;
+    }
+};
+
 export const createEvent = async (formData) => {
     const token = localStorage.getItem('token');
     try{

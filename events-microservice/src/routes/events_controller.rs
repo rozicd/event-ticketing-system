@@ -235,7 +235,7 @@ async fn create_ticket(
                     body.event_id,
                     body.user_id,
                     body.quantity,
-                    chrono::Utc::now()
+                    Utc::now()
                 )
                 .fetch_one(&mut *transaction) // Dereference the transaction
                 .await;
@@ -264,7 +264,7 @@ async fn create_ticket(
 
                                 // Send the updated event to the event queue
                                 let event_json = serde_json::to_string(&updated_event).unwrap();
-                                let publish_result = data.amqp_channel.basic_publish(
+                                let publish_event_result = data.amqp_channel.basic_publish(
                                     "",
                                     "event_queue",
                                     BasicPublishOptions::default(),
@@ -273,8 +273,19 @@ async fn create_ticket(
                                 )
                                 .await;
 
-                                match publish_result {
-                                    Ok(_) => {
+                                // Send the created ticket to the tickets queue
+                                let ticket_json = serde_json::to_string(&ticket).unwrap();
+                                let publish_ticket_result = data.amqp_channel.basic_publish(
+                                    "",
+                                    "tickets_queue",
+                                    BasicPublishOptions::default(),
+                                    ticket_json.as_bytes(),
+                                    BasicProperties::default(),
+                                )
+                                .await;
+
+                                match (publish_event_result, publish_ticket_result) {
+                                    (Ok(_), Ok(_)) => {
                                         let ticket_response = serde_json::json!({
                                             "status": "success",
                                             "data": {
@@ -283,10 +294,10 @@ async fn create_ticket(
                                         });
                                         HttpResponse::Ok().json(ticket_response)
                                     }
-                                    Err(e) => {
+                                    _ => {
                                         HttpResponse::InternalServerError().json(serde_json::json!({
                                             "status": "error",
-                                            "message": format!("Failed to publish event: {:?}", e)
+                                            "message": "Failed to publish event or ticket"
                                         }))
                                     }
                                 }
