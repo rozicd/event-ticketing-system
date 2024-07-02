@@ -161,7 +161,7 @@ const EventPage = () => {
       >
         <Box
           component="img"
-          src={"http://localhost:5000/gateway/uploads/" + event.image_path}
+          src={"http://localhost:5005/gateway/uploads/" + event.image_path}
           alt="Event Image"
           sx={{
             width: '95%',

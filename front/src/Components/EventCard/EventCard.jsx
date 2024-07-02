@@ -30,7 +30,7 @@ const EventCard = ({ event }) => {
       >
         <Box
           component="img"
-          src={"http://localhost:5000/gateway/uploads/" + event.image_path}
+          src={"http://localhost:5005/gateway/uploads/" + event.image_path}
           alt={event.name}
           sx={{
             marginTop: '5px',
