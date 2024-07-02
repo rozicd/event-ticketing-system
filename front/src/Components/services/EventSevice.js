@@ -72,3 +72,17 @@ export const createTicket = async (quantity, event_id) => {
       throw error;
     }
   }
+
+  export const getTickets = async () => {
+    const token = localStorage.getItem('token');
+    try{
+      const response = await axios.get(`${EVENT_API_URL}/users-tickets`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      return response.data;
+    }catch(error){
+      throw(error);
+    }
+  }

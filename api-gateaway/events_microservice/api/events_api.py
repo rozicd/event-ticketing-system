@@ -28,6 +28,12 @@ def get_event(event_id):
     return jsonify(response.json()), response.status_code
 
 @jwt_required()
+def get_users_tickets():
+    user_id = get_jwt_identity().get('id')
+    response = requests.get(f'{MICROSERVICE_URL}/tickets/{user_id}')
+    return jsonify(response.json()), response.status_code
+
+@jwt_required()
 def create_ticket():
     data = request.get_json()
     data['user_id'] = get_jwt_identity().get('id')

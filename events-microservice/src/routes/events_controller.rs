@@ -199,6 +199,32 @@ async fn get_events(data: web::Data<AppState>) -> impl Responder {
     }
 }
 
+#[get("/tickets/{user_id}")]
+async fn get_users_tickets(path: web::Path<Uuid>, data: web::Data<AppState>) -> impl Responder {
+    let id = path.into_inner();
+    let query_result = sqlx::query_as!(
+        Ticket,
+        "SELECT * FROM tickets WHERE user_id = $1",
+        id
+    )
+    .fetch_all(&data.db)
+    .await;
+    match query_result {
+        Ok(events) => {
+            let events_response = serde_json::json!({"status": "success", "data": serde_json::json!({
+                "events": events
+            })});
+            return HttpResponse::Ok().json(events_response);
+        }
+        Err(e) => {
+            return HttpResponse::InternalServerError()
+                .json(serde_json::json!({"status": "error", "message": format!("{:?}", e)}));
+        }
+    }
+}
+
+
+
 #[post("/tickets")]
 async fn create_ticket(
     body: web::Json<CreateTicket>,

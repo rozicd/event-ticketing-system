@@ -13,6 +13,7 @@ import { Navigate } from 'react-router';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import EventPage from './Pages/EventPage';
+import UsersTicketsPage from './Pages/UsersTicketsPage';
 import './Components/setupLeafletIcons';
 
 function App() {
@@ -38,7 +39,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/home/event/:id" element={<EventPage />} />
           <Route path="/create-event" element={<CreateEvent />} />
-          <Route path="/my-events" element={<MyEvents />} />
+          <Route path="/tickets" element={<UsersTicketsPage />} />
           <Route path="/login" element={loggedUser ? <Navigate to="/home" /> : <Login />} />
           <Route path="/register" element={loggedUser ? <Navigate to="/home" /> : <Register />} />
         </Routes>
