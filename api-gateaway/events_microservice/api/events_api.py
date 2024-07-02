@@ -11,12 +11,6 @@ MICROSERVICE_URL = 'http://localhost:8080/api'
 UPLOAD_FOLDER = '././uploads'
 
 
-# def create_event():
-#     data = request.get_json()
-#     data['organizator_id'] = get_jwt_identity().get('id')
-#     response = requests.post(f'{MICROSERVICE_URL}/events', json=data)
-#     return jsonify(response.json()), response.status_code
-
 @jwt_required()
 def update_event(event_id):
     data = request.get_json()
@@ -33,6 +27,12 @@ def get_event(event_id):
     response = requests.get(f'{MICROSERVICE_URL}/events/{event_id}')
     return jsonify(response.json()), response.status_code
 
+@jwt_required()
+def create_ticket():
+    data = request.get_json()
+    data['user_id'] = get_jwt_identity().get('id')
+    response = requests.post(f'{MICROSERVICE_URL}/tickets', json=data)
+    return jsonify(response.json()), response.status_code
 @jwt_required()
 def create_event():
     data = request.form.to_dict()
