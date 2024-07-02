@@ -28,19 +28,16 @@ export default function Navbar({ loggedUser }) {
             <AppBar>
                 <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography variant="h6" component="div" sx={{ marginRight: '15px' }}>
-                        News
+                        Event ticketing system
                     </Typography>
                     <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                         <Button color="inherit" sx={{ margin: '3px' }} onClick={() => handleNavigation('/home')}>
                             Events
                         </Button>
-                        <Button color="inherit" sx={{ margin: '3px' }} onClick={() => handleNavigation('/past')}>
-                            Past
-                        </Button>
                         {loggedUser && (
                             <>
-                                <Button color="inherit" sx={{ margin: '3px' }} onClick={() => handleNavigation('/my-events')}>
-                                    My events
+                                <Button color="inherit" sx={{ margin: '3px' }} onClick={() => handleNavigation('/tickets')}>
+                                    Tickets
                                 </Button>
                                 <Button color="inherit" sx={{ margin: '3px' }} onClick={() => handleNavigation('/create-event')}>
                                     Create event
