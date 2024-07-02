@@ -27,10 +27,10 @@ export default function Navbar({ loggedUser }) {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', position: 'static', marginBottom: '60px' }}>
             <AppBar>
                 <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="h6" component="div" sx={{ marginRight: '15px' }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'row', alignItems:"center" }}>
+                    <Typography variant="h6" component="div" fontStyle="italic" sx={{ marginRight: '15px', textAlign:"center" }}>
                         Event ticketing system
                     </Typography>
-                    <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                         <Button color="inherit" sx={{ margin: '3px' }} onClick={() => handleNavigation('/home')}>
                             Events
                         </Button>
