@@ -17,6 +17,7 @@ import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { getEventAnalitics } from '../Components/services/AnaliticsService';
 import ReviewDialog from '../Components/Dialogs/ReviewDialog';
+import Reviews from '../Components/Reviews/Reviews';
 
 // Component to update map view
 const MapViewUpdater = ({ center }) => {
@@ -127,7 +128,7 @@ const EventPage = () => {
     };
     extractUserIdFromJWT();
     fetchEvent();
-    fetchAnalitics(timeRange);
+    if(userId === event.organizator_id){fetchAnalitics(timeRange);}
   }, [id, timeRange]);
 
   const convertIsoDateTime = (isoDateTime) => {
@@ -266,10 +267,11 @@ const EventPage = () => {
           alignItems: 'center',
           boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.3)',
           padding: 2,
-          marginTop:"20px"
+          marginTop:"20px",
+          overflowY:"scroll"
           }}
       >
-
+        <Reviews eventId={id} />
       </Paper>
       </Box>
       <NumberInputDialog open={open} onClose={handleCloseDialog} onConfirm={handleConfirmDialog} />

@@ -20,7 +20,7 @@ const ReviewDialog = ({ open, onClose, eventId }) => {
     const reviewData = {
       rating: rating,
       comment: comment,
-      eventId: eventId,
+      event_id: eventId,
     };
     // Perform any action with reviewData, like submitting to backend
     console.log('Review Data:', reviewData);
@@ -30,7 +30,7 @@ const ReviewDialog = ({ open, onClose, eventId }) => {
         window.location.reload();
     }catch(error){
         console.error('Failed to create review:', error);
-        throw error;
+        window.alert('Failed to create review');
     }
     onClose();
   };
@@ -42,6 +42,8 @@ const ReviewDialog = ({ open, onClose, eventId }) => {
         <Box display="flex" alignItems="center" justifyContent="center">
           <Rating
             name="event-rating"
+            defaultValue={0.0} 
+            precision={0.5}
             value={rating}
             onChange={(event, newValue) => {
               setRating(newValue);
